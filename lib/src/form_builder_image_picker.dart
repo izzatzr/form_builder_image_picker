@@ -77,139 +77,138 @@ class FormBuilderImagePicker extends FormBuilderField<List<dynamic>> {
     this.galleryLabel = const Text('Gallery'),
     this.bottomSheetPadding = EdgeInsets.zero,
     this.placeholderImage,
-  })
-      : assert(maxImages == null || maxImages >= 0),
+  })  : assert(maxImages == null || maxImages >= 0),
         super(
-        key: key,
-        initialValue: initialValue,
-        name: name,
-        validator: validator,
-        valueTransformer: valueTransformer,
-        onChanged: onChanged,
-        autovalidateMode: autovalidateMode,
-        onSaved: onSaved,
-        enabled: enabled,
-        onReset: onReset,
-        decoration: decoration,
-        focusNode: focusNode,
-        builder: (FormFieldState<List<dynamic>> field) {
-          final state = field as _FormBuilderImagePickerState;
-          final theme = Theme.of(state.context);
-          final disabledColor = theme.disabledColor;
-          final primaryColor = theme.primaryColor;
+          key: key,
+          initialValue: initialValue,
+          name: name,
+          validator: validator,
+          valueTransformer: valueTransformer,
+          onChanged: onChanged,
+          autovalidateMode: autovalidateMode,
+          onSaved: onSaved,
+          enabled: enabled,
+          onReset: onReset,
+          decoration: decoration,
+          focusNode: focusNode,
+          builder: (FormFieldState<List<dynamic>> field) {
+            final state = field as _FormBuilderImagePickerState;
+            final theme = Theme.of(state.context);
+            final disabledColor = theme.disabledColor;
+            final primaryColor = theme.primaryColor;
 
-          return InputDecorator(
-            decoration: state.decoration(),
-            child: Container(
-              height: previewHeight,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                  if (field.value != null)
-                    ...field.value.map<Widget>((dynamic item) {
-                      assert(item is File ||
-                          item is String ||
-                          item is Uint8List);
-                      return Stack(
-                        alignment: Alignment.topRight,
-                        children: <Widget>[
-                          Container(
-                            width: previewWidth,
-                            height: previewHeight,
-                            margin: previewMargin,
-                            child: kIsWeb
-                                ? Image.memory(item as Uint8List,
-                                fit: BoxFit.cover)
-                                : item is String
-                                ? Image.network(item, fit: BoxFit.cover)
-                                : Image.file(item as File,
-                                fit: BoxFit.cover),
-                          ),
-                          if (state.enabled)
-                            InkWell(
-                              onTap: () {
-                                state.requestFocus();
-                                field.didChange(
-                                    <dynamic>[...field.value]..remove(item));
-                              },
-                              child: Container(
-                                margin: const EdgeInsets.all(3),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.withOpacity(.7),
-                                  shape: BoxShape.circle,
-                                ),
-                                alignment: Alignment.center,
-                                height: 22,
-                                width: 22,
-                                child: const Icon(
-                                  Icons.close,
-                                  size: 18,
-                                  color: Colors.white,
+            return InputDecorator(
+              decoration: state.decoration(),
+              child: Container(
+                height: previewHeight,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    if (field.value != null)
+                      ...field.value.map<Widget>((dynamic item) {
+                        assert(item is File ||
+                            item is String ||
+                            item is Uint8List);
+                        return Stack(
+                          alignment: Alignment.topRight,
+                          children: <Widget>[
+                            Container(
+                              width: previewWidth,
+                              height: previewHeight,
+                              margin: previewMargin,
+                              child: kIsWeb
+                                  ? Image.memory(item as Uint8List,
+                                      fit: BoxFit.cover)
+                                  : item is String
+                                      ? Image.network(item, fit: BoxFit.cover)
+                                      : Image.file(item as File,
+                                          fit: BoxFit.cover),
+                            ),
+                            if (state.enabled)
+                              InkWell(
+                                onTap: () {
+                                  state.requestFocus();
+                                  field.didChange(
+                                      <dynamic>[...field.value]..remove(item));
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.all(3),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.withOpacity(.7),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  alignment: Alignment.center,
+                                  height: 22,
+                                  width: 22,
+                                  child: const Icon(
+                                    Icons.close,
+                                    size: 18,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
-                            ),
-                        ],
-                      );
-                    }),
-                  if (state.enabled && !state.hasMaxImages)
-                    GestureDetector(
-                      child: placeholderImage != null
-                          ? Image(
-                        width: previewWidth,
-                        height: previewHeight,
-                        image: placeholderImage,
-                      )
-                          : Container(
-                          width: previewWidth,
-                          height: previewHeight,
-                          child: Icon(
-                            Icons.camera_enhance,
-                            color: state.enabled
-                                ? iconColor ?? primaryColor
-                                : disabledColor,
-                          ),
-                          color: (state.enabled
-                              ? iconColor ?? primaryColor
-                              : disabledColor)
-                              .withAlpha(50)),
-                      onTap: () {
-                        showModalBottomSheet<void>(
-                          context: state.context,
-                          builder: (_) {
-                            return ImageSourceBottomSheet(
-                              maxHeight: maxHeight,
-                              maxWidth: maxWidth,
-                              imageQuality: imageQuality,
-                              preferredCameraDevice: preferredCameraDevice,
-                              sources: sources,
-                              bottomSheetPadding: bottomSheetPadding,
-                              cameraIcon: cameraIcon,
-                              cameraLabel: cameraLabel,
-                              galleryIcon: galleryIcon,
-                              galleryLabel: galleryLabel,
-                              onImageSelected: (image) {
-                                state.requestFocus();
-                                field.didChange(
-                                    <dynamic>[...?field.value, image]);
-                                Navigator.pop(state.context);
-                              },
-                              onImage: (image) {
-                                field.didChange(
-                                    <dynamic>[...?field.value, image]);
-                                onChanged?.call(field.value);
-                                Navigator.pop(state.context);
-                              },
-                            );
-                          },
+                          ],
                         );
-                      },
-                    ),
-                ],
+                      }),
+                    if (state.enabled && !state.hasMaxImages)
+                      GestureDetector(
+                        child: placeholderImage != null
+                            ? Image(
+                                width: previewWidth,
+                                height: previewHeight,
+                                image: placeholderImage,
+                              )
+                            : Container(
+                                width: previewWidth,
+                                height: previewHeight,
+                                child: Icon(
+                                  Icons.camera_enhance,
+                                  color: state.enabled
+                                      ? iconColor ?? primaryColor
+                                      : disabledColor,
+                                ),
+                                color: (state.enabled
+                                        ? iconColor ?? primaryColor
+                                        : disabledColor)
+                                    .withAlpha(50)),
+                        onTap: () {
+                          showModalBottomSheet<void>(
+                            context: state.context,
+                            builder: (_) {
+                              return ImageSourceBottomSheet(
+                                maxHeight: maxHeight,
+                                maxWidth: maxWidth,
+                                imageQuality: imageQuality,
+                                preferredCameraDevice: preferredCameraDevice,
+                                sources: sources,
+                                bottomSheetPadding: bottomSheetPadding,
+                                cameraIcon: cameraIcon,
+                                cameraLabel: cameraLabel,
+                                galleryIcon: galleryIcon,
+                                galleryLabel: galleryLabel,
+                                onImageSelected: (image) {
+                                  state.requestFocus();
+                                  field.didChange(
+                                      <dynamic>[...?field.value, image]);
+                                  Navigator.pop(state.context);
+                                },
+                                onImage: (image) {
+                                  field.didChange(
+                                      <dynamic>[...?field.value, image]);
+                                  onChanged?.call(field.value);
+                                  Navigator.pop(state.context);
+                                },
+                              );
+                            },
+                          );
+                        },
+                      ),
+                  ],
+                ),
               ),
-            ),
-          );
-        },
-      );
+            );
+          },
+        );
 
   @override
   _FormBuilderImagePickerState createState() => _FormBuilderImagePickerState();
@@ -219,6 +218,6 @@ class _FormBuilderImagePickerState
     extends FormBuilderFieldState<FormBuilderImagePicker, List<dynamic>> {
   bool get hasMaxImages =>
       widget.maxImages != null &&
-          value != null &&
-          value.length >= widget.maxImages;
+      value != null &&
+      value.length >= widget.maxImages;
 }
